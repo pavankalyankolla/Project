@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
+    <title>Document</title>
+</head>
+<body>
+    <input type="text" placeholder="Enter Area name " name="address" onFocus="initializeAutocomplete()" id="location" ><br>
+    <select id="name">
+        
+    </select>
+    <!-- <input type="text"id="name1"/> -->
+    <button id="btn">click</button>
+    <div id="app"></div>
+    <script>
+        var appHandle = document.getElementById('app');
+        var inputHandle = document.getElementById('name');
+        // var inputHandle1 = document.getElementById('name1');
+
+        var btnHandle = document.getElementById('btn');
+
+        function initializeAutocomplete(){
+        var input = document.getElementById('location');
+        var autocomplete = new google.maps.places.Autocomplete(input);
+        
+        google.maps.event.addListener(autocomplete, 'place_changed', function() {
+        var place = autocomplete.getPlace();
+        var lat = place.geometry.location.lat();
+        var lng = place.geometry.location.lng();
+    appHandle.innerHTML = `latitude ${lat} -- longitude${lng}`
+    localStorage.setItem("latitude",JSON.stringify(lat));
+    localStorage.setItem("longitude",JSON.stringify(lng));
+
+    var x = JSON.parse(localStorage.getItem('latitude'));
+    console.log(x);
+    var y = JSON.parse(localStorage.getItem('longitude'));
+    console.log(y);
+
+    axios.get('http://localhost:3000/technologies').then((response) => {
+        // console.log(response.data)
+        response.data.forEach((tech) => {
+            console.log(tech);
+            inputHandle.innerHTML += `<option value = ${tech.name}> ${tech.name} </option>`
+        }) 
+    }) .catch((err) => {
+        console.log(err);
+    })
+
+    btnHandle.addEventListener('click',()=>{
+            axios.get(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${x},${y}&radius=1500&keyword=${inputHandle.value}&key=${key}`) .then((response) => {
+                // console.log(response.data);
+            
+                var output = response.data.results.sort((a,b) => {return b.rating - a.rating})
+            
+                output.forEach((out) => {
+                appHandle.innerHTML += `<h4>${out.name}--- Rating: ${out.rating}</h4> <a href="../playground/maps.html?lat=${out.geometry.location.lat}&lon=${out.geometry.location.lng}">Locate in Map </a>`
+                })
+            }) .catch((err) => {
+                console.log(err);
+            })
+        },false);
+
+    },false);
+}
+    
+    </script>
+    <script src="../access_key.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</body>
+</html>
