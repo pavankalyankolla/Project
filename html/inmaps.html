@@ -42,21 +42,22 @@
     axios.get('http://localhost:3000/technologies').then((response) => {
         // console.log(response.data)
         response.data.forEach((tech) => {
-            console.log(tech);
+            // console.log(tech);
             inputHandle.innerHTML += `<option value = ${tech.name}> ${tech.name} </option>`
         }) 
     }) .catch((err) => {
         console.log(err);
     })
 
-    btnHandle.addEventListener('click',()=>{
+    btnHandle.addEventListener('click',()=>{    
+            appHandle.innerHTML = ''
+
             axios.get(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${x},${y}&radius=1500&keyword=${inputHandle.value}&key=${key}`) .then((response) => {
                 // console.log(response.data);
             
                 var output = response.data.results.sort((a,b) => {return b.rating - a.rating})
-            
                 output.forEach((out) => {
-                appHandle.innerHTML += `<h4>${out.name}--- Rating: ${out.rating}</h4> <a href="../playground/maps.html?lat=${out.geometry.location.lat}&lon=${out.geometry.location.lng}">Locate in Map </a>`
+                appHandle.innerHTML += `<h4>${out.name}--- Rating: ${out.rating}</h4> <a href="../playground/maps.html?lat=${out.geometry.location.lat}&lon=${out.geometry.location.lng}&institute=${out.name}">Locate in Map </a>`
                 })
             }) .catch((err) => {
                 console.log(err);
